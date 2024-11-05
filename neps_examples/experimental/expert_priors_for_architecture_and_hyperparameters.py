@@ -69,7 +69,8 @@ def set_recursive_attribute(op_name, predecessor_values):
     return dict(C_in=in_channels, C_out=out_channels)
 
 
-def run_pipeline(some_architecture, some_float, some_integer, some_cat):
+def run_pipeline(some_architecture, some_float, some_integer, some_cat, fidelity):
+    print(fidelity)
     start = time.time()
 
     in_channels = 3
@@ -101,6 +102,7 @@ def run_pipeline(some_architecture, some_float, some_integer, some_cat):
         "info_dict": {
             "test_score": y,
             "train_time": end - start,
+            "number_of_params": number_of_params,
         },
     }
 
@@ -121,6 +123,9 @@ pipeline_space = dict(
     ),
     some_cat=neps.CategoricalParameter(
         choices=["a", "b", "c"], default="a", default_confidence="high"
+    ),
+    fidelity=neps.IntegerParameter(
+        lower=1, upper=50, is_fidelity=True
     ),
 )
 
