@@ -56,6 +56,7 @@ class SuccessiveHalvingBase(BaseOptimizer):
         random_interleave_prob: float = 0.0,
         sample_default_first: bool = False,
         sample_default_at_target: bool = False,
+        mo_optimizer = None,
     ):
         """Initialise an SH bracket.
 
@@ -93,6 +94,7 @@ class SuccessiveHalvingBase(BaseOptimizer):
             cost_value_on_error=cost_value_on_error,
             ignore_errors=ignore_errors,
             logger=logger,
+            mo_optimizer=mo_optimizer,
         )
         if random_interleave_prob < 0 or random_interleave_prob > 1:
             raise ValueError("random_interleave_prob should be in [0.0, 1.0]")
@@ -225,7 +227,7 @@ class SuccessiveHalvingBase(BaseOptimizer):
     ) -> None:
         for config_id, config_val in previous_results.items():
             _config, _rung = self._get_config_id_split(config_id)
-            perf = self.get_loss(config_val.result)
+            perf = self.get_loss(config_val)
             if int(_config) in self.observed_configs.index:
                 # config already recorded in dataframe
                 rung_recorded = self.observed_configs.at[int(_config), "rung"]
@@ -441,6 +443,9 @@ class SuccessiveHalvingBase(BaseOptimizer):
 
             previous_config_id = None
             config_id = f"{self._generate_new_config_id()}_{rung_id}"
+
+        if self.mo_optimizer is not None:
+            self.mo_optimizer.add_config(config_id)
 
         return config.hp_values(), config_id, previous_config_id  # type: ignore
 

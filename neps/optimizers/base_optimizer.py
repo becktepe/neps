@@ -11,7 +11,7 @@ from neps.utils.types import ConfigResult, RawConfig, ERROR, ResultDict
 from neps.utils.files import serialize, deserialize
 from neps.search_spaces.search_space import SearchSpace
 from neps.utils.data_loading import _get_cost, _get_learning_curve, _get_loss
-
+from neps.optimizers.multi_objective.parego import ParEGO
 
 class BaseOptimizer:
     """Base sampler class. Implements all the low-level work."""
@@ -26,6 +26,7 @@ class BaseOptimizer:
         cost_value_on_error: float | None = None,
         learning_curve_on_error: float | list[float] | None = None,
         ignore_errors=False,
+        mo_optimizer: ParEGO | None = None,
     ) -> None:
         if patience < 1:
             raise ValueError("Patience should be at least 1")
@@ -39,6 +40,8 @@ class BaseOptimizer:
         self.cost_value_on_error = cost_value_on_error
         self.learning_curve_on_error = learning_curve_on_error
         self.ignore_errors = ignore_errors
+
+        self.mo_optimizer = mo_optimizer
 
     @abstractmethod
     def load_results(
@@ -78,14 +81,28 @@ class BaseOptimizer:
         config.load_from(config_dict)
         return config
 
-    def get_loss(self, result: ERROR | ResultDict | float) -> float | Any:
+    def get_loss(self, config_result: ConfigResult) -> float | Any:
         """Calls result.utils.get_loss() and passes the error handling through.
         Please use self.get_loss() instead of get_loss() in all optimizer classes."""
-        return _get_loss(
-            result,
-            loss_value_on_error=self.loss_value_on_error,
-            ignore_errors=self.ignore_errors,
-        )
+        if self.mo_optimizer and not config_result.result == "error":
+            if not isinstance(config_result.result, dict):
+                raise ValueError(
+                    "Multi-objective optimization requires a dictionary result"
+                )
+            
+            result = self.mo_optimizer.scalarize_result(config_result)
+
+            return _get_loss(
+                result,
+                loss_value_on_error=self.loss_value_on_error,
+                ignore_errors=self.ignore_errors,
+            )
+        else:
+            return _get_loss(
+                config_result.result,
+                loss_value_on_error=self.loss_value_on_error,
+                ignore_errors=self.ignore_errors,
+            )
 
     def get_cost(self, result: ERROR | ResultDict | float) -> float | Any:
         """Calls result.utils.get_cost() and passes the error handling through.

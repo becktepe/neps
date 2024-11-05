@@ -55,6 +55,7 @@ class HyperbandBase(SuccessiveHalvingBase):
         random_interleave_prob: float = 0.0,
         sample_default_first: bool = False,
         sample_default_at_target: bool = False,
+        mo_optimizer = None,
     ):
         args = dict(
             pipeline_space=pipeline_space,
@@ -73,6 +74,7 @@ class HyperbandBase(SuccessiveHalvingBase):
             random_interleave_prob=random_interleave_prob,
             sample_default_first=sample_default_first,
             sample_default_at_target=sample_default_at_target,
+            mo_optimizer=mo_optimizer
         )
         super().__init__(**args)
         # stores the flattened sequence of SH brackets to loop over - the HB heuristic
@@ -246,6 +248,7 @@ class HyperbandWithPriors(Hyperband):
         random_interleave_prob: float = 0.0,
         sample_default_first: bool = False,
         sample_default_at_target: bool = False,
+        mo_optimizer = None
     ):
         super().__init__(
             pipeline_space=pipeline_space,
@@ -263,6 +266,7 @@ class HyperbandWithPriors(Hyperband):
             random_interleave_prob=random_interleave_prob,
             sample_default_first=sample_default_first,
             sample_default_at_target=sample_default_at_target,
+            mo_optimizer=mo_optimizer
         )
 
 
@@ -285,6 +289,7 @@ class HyperbandCustomDefault(HyperbandWithPriors):
         random_interleave_prob: float = 0.0,
         sample_default_first: bool = False,
         sample_default_at_target: bool = False,
+        mo_optimizer = None,
     ):
         super().__init__(
             pipeline_space=pipeline_space,
@@ -301,6 +306,7 @@ class HyperbandCustomDefault(HyperbandWithPriors):
             random_interleave_prob=random_interleave_prob,
             sample_default_first=sample_default_first,
             sample_default_at_target=sample_default_at_target,
+            mo_optimizer=mo_optimizer
         )
         self.sampling_args = {
             "inc": None,

@@ -307,6 +307,7 @@ class PriorBand(MFBOBase, HyperbandCustomDefault, PriorBandBase):
         acquisition: str | BaseAcquisition = "EI",
         log_prior_weighted: bool = False,
         acquisition_sampler: str | AcquisitionSampler = "random",
+        mo_optimizer = None,
     ):
         super().__init__(
             pipeline_space=pipeline_space,
@@ -323,6 +324,7 @@ class PriorBand(MFBOBase, HyperbandCustomDefault, PriorBandBase):
             random_interleave_prob=random_interleave_prob,
             sample_default_first=sample_default_first,
             sample_default_at_target=sample_default_at_target,
+            mo_optimizer=mo_optimizer
         )
         self.prior_weight_type = prior_weight_type
         self.inc_sample_type = inc_sample_type
