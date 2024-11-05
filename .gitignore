@@ -26,7 +26,6 @@ poetry.lock
 *.sh
 *.model
 *.pth
-*.png
 
 # Results
 results
