@@ -43,6 +43,11 @@ class ParEGO:
         self._config_weights = {}
         self._weights = self._sample_weights()
 
+        # We assign configurations with the same weights to the same group
+        # to allow for hyperband promotion based on groups
+        self._config_groups = {}
+        self._cur_config_group = 0
+
         if objective_bounds is None:
             # List of (min, max) tuples for each objective
             self._objective_bounds = [(None, None)] * len(objectives)
@@ -62,7 +67,7 @@ class ParEGO:
         normalized_objectives = objectives.copy()
         
         for i, (min_val, max_val) in enumerate(self._objective_bounds):
-            if min_val is not None and max_val is not None:
+            if min_val is not None and max_val is not None and max_val - min_val != 0:
                 normalized_objectives[i] = (objectives[i] - min_val) / (max_val - min_val)
 
         return normalized_objectives
@@ -85,17 +90,36 @@ class ParEGO:
     def _extract_config_id(self, config_id: str) -> str:
         """Extract the configuration ID from a full ID."""
         return config_id.split("_")[0]
-        
+
+    def _next_group(self) -> None:
+        """Move to the next group of configurations."""
+        logger.info(f"Moving to next group of configurations.")
+
+        self._cur_config_group += 1
+        self._weights = self._sample_weights()
+
+    def get_group_id(self, config_id: str) -> int:
+        """Get the group ID of a configuration."""
+        config_id = self._extract_config_id(config_id)
+        return self._config_groups[config_id]
+    
     def add_config(self, config_id: str) -> None:
         """Add a configuration to the optimizer."""
         config_id = self._extract_config_id(config_id)
+
+        # This means that we are in the first stage of the current
+        # hyperband bracket. Here we want so sample new weights
         if config_id not in self._config_weights:
             self._config_weights[config_id] = self._weights
+            self._config_groups[config_id] = self._cur_config_group
             logger.info(f"Added configuration {config_id} to ParEGO.")
 
+            # This ensure that we have groups of <eta> configurations
             if len(self._config_weights) % self._eta == 0:
-                logger.info(f"Resampling Weights")
-                self._weights = self._sample_weights()
+                self._next_group()
+        
+        # Configurations that we have already seen keep their weights 
+        # until the bitter end :-)
         else:
             logger.info(f"Configuration {config_id} already exists in ParEGO.")
 

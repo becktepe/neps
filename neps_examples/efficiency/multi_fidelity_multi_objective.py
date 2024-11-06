@@ -5,7 +5,9 @@ import numpy as np
 import neps
 import neps.optimizers
 import neps.optimizers.multi_objective
-import neps.optimizers.multi_objective.parego
+from neps.optimizers.multi_objective.parego import ParEGO
+from neps.optimizers.multi_objective.parego_promotion_policy import ParEGOPromotionPolicy
+
 
 
 def run_pipeline(float1, float2, integer1, fidelity):
@@ -32,16 +34,18 @@ import datetime as datetime
 # Get datetime string
 datetime_str = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
 
-mo_optimizer = neps.optimizers.multi_objective.parego.ParEGO(objectives=["loss", "loss2"])
+mo_optimizer = ParEGO(objectives=["loss", "loss2"])
 
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(level=logging.ERROR)
 neps.run(
     run_pipeline=run_pipeline,
     pipeline_space=pipeline_space,
     root_directory="results/multifidelity_priors/" + datetime_str,
     max_evaluations_total=25,  # For an alternate stopping method see multi_fidelity.py,
     searcher="priorband",
-    mo_optimizer=mo_optimizer
+    mo_optimizer=mo_optimizer,
+    promotion_policy=ParEGOPromotionPolicy,
+
 )
 
 import pandas as pd

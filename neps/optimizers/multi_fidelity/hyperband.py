@@ -16,6 +16,7 @@ from neps.optimizers.bayesian_optimization.acquisition_samplers.base_acq_sampler
     AcquisitionSampler,
 )
 from neps.optimizers.multi_fidelity.mf_bo import MFBOBase
+from neps.optimizers.multi_objective.parego_promotion_policy import ParEGOPromotionPolicy
 from neps.optimizers.multi_fidelity.promotion_policy import (
     AsyncPromotionPolicy,
     SyncPromotionPolicy,
@@ -114,10 +115,17 @@ class HyperbandBase(SuccessiveHalvingBase):
         return
 
     def _handle_promotions(self):
-        self.promotion_policy.set_state(
+        promotion_policy_kwargs = dict(
             max_rung=self.max_rung,
             members=self.rung_members,
             performances=self.rung_members_performance,
+        )
+
+        if isinstance(self.promotion_policy, ParEGOPromotionPolicy):
+            promotion_policy_kwargs["group_ids"] = self.rung_members_group_id
+
+        self.promotion_policy.set_state(
+            **promotion_policy_kwargs,
             **self.promotion_policy_kwargs,
         )
         # promotions are handled by the individual SH brackets which are explicitly

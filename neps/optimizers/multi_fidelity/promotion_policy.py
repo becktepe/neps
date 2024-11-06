@@ -82,6 +82,9 @@ class SyncPromotionPolicy(PromotionPolicy):
                 )
                 selected_idx = np.argsort(self.rung_members_performance[rung])[:top_k]
                 self.rung_promotions[rung] = self.rung_members[rung][selected_idx]
+
+        print("TRUE PROMOTIONS:", self.rung_promotions)
+    
         return self.rung_promotions
 
 

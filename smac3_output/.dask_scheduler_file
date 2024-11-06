@@ -1,279 +1,24 @@
 {
   "type": "Scheduler",
-  "id": "Scheduler-8ee64ad0-b34e-412f-a1b4-f4c73986e15a",
-  "address": "tcp://127.0.0.1:43155",
+  "id": "Scheduler-48a5f92b-a802-49be-a3cb-3d87665d71f0",
+  "address": "tcp://127.0.0.1:44845",
   "services": {
     "dashboard": 8787
   },
-  "started": 1730848609.358703,
+  "started": 1730893303.300253,
   "workers": {
-    "tcp://127.0.0.1:35621": {
-      "type": "Worker",
-      "id": 1,
-      "host": "127.0.0.1",
-      "resources": {},
-      "local_directory": "/mnt/home/jbecktep/git_projects/neps/smac3_output/dask-scratch-space/worker-0lslbcxz",
-      "name": 1,
-      "nthreads": 1,
-      "memory_limit": 135215072256,
-      "last_seen": 1730848615.2851164,
-      "services": {
-        "dashboard": 40941
-      },
-      "metrics": {
-        "task_counts": {},
-        "bandwidth": {
-          "total": 100000000,
-          "workers": {},
-          "types": {}
-        },
-        "digests_total_since_heartbeat": {},
-        "managed_bytes": 0,
-        "spilled_bytes": {
-          "memory": 0,
-          "disk": 0
-        },
-        "transfer": {
-          "incoming_bytes": 0,
-          "incoming_count": 0,
-          "incoming_count_total": 0,
-          "outgoing_bytes": 0,
-          "outgoing_count": 0,
-          "outgoing_count_total": 0
-        },
-        "event_loop_interval": 0.02,
-        "cpu": 0.0,
-        "memory": 188915712,
-        "time": 1730848615.203021,
-        "host_net_io": {
-          "read_bps": 0.0,
-          "write_bps": 0.0
-        },
-        "host_disk_io": {
-          "read_bps": 0.0,
-          "write_bps": 0.0
-        },
-        "num_fds": 17
-      },
-      "status": "running",
-      "nanny": "tcp://127.0.0.1:36589"
-    },
-    "tcp://127.0.0.1:37399": {
-      "type": "Worker",
-      "id": 3,
-      "host": "127.0.0.1",
-      "resources": {},
-      "local_directory": "/mnt/home/jbecktep/git_projects/neps/smac3_output/dask-scratch-space/worker-22d0r9ko",
-      "name": 3,
-      "nthreads": 1,
-      "memory_limit": 135215072256,
-      "last_seen": 1730848614.549865,
-      "services": {
-        "dashboard": 36451
-      },
-      "metrics": {
-        "task_counts": {},
-        "bandwidth": {
-          "total": 100000000,
-          "workers": {},
-          "types": {}
-        },
-        "digests_total_since_heartbeat": {},
-        "managed_bytes": 0,
-        "spilled_bytes": {
-          "memory": 0,
-          "disk": 0
-        },
-        "transfer": {
-          "incoming_bytes": 0,
-          "incoming_count": 0,
-          "incoming_count_total": 0,
-          "outgoing_bytes": 0,
-          "outgoing_count": 0,
-          "outgoing_count_total": 0
-        },
-        "event_loop_interval": 0.02,
-        "cpu": 0.0,
-        "memory": 189247488,
-        "time": 1730848614.482602,
-        "host_net_io": {
-          "read_bps": 0.0,
-          "write_bps": 0.0
-        },
-        "host_disk_io": {
-          "read_bps": 0.0,
-          "write_bps": 0.0
-        },
-        "num_fds": 17
-      },
-      "status": "running",
-      "nanny": "tcp://127.0.0.1:45083"
-    },
-    "tcp://127.0.0.1:38533": {
-      "type": "Worker",
-      "id": 0,
-      "host": "127.0.0.1",
-      "resources": {},
-      "local_directory": "/mnt/home/jbecktep/git_projects/neps/smac3_output/dask-scratch-space/worker-9ecaua7u",
-      "name": 0,
-      "nthreads": 1,
-      "memory_limit": 135215072256,
-      "last_seen": 1730848614.5971217,
-      "services": {
-        "dashboard": 44375
-      },
-      "metrics": {
-        "task_counts": {},
-        "bandwidth": {
-          "total": 100000000,
-          "workers": {},
-          "types": {}
-        },
-        "digests_total_since_heartbeat": {},
-        "managed_bytes": 0,
-        "spilled_bytes": {
-          "memory": 0,
-          "disk": 0
-        },
-        "transfer": {
-          "incoming_bytes": 0,
-          "incoming_count": 0,
-          "incoming_count_total": 0,
-          "outgoing_bytes": 0,
-          "outgoing_count": 0,
-          "outgoing_count_total": 0
-        },
-        "event_loop_interval": 0.02,
-        "cpu": 0.0,
-        "memory": 189186048,
-        "time": 1730848614.546995,
-        "host_net_io": {
-          "read_bps": 0.0,
-          "write_bps": 0.0
-        },
-        "host_disk_io": {
-          "read_bps": 0.0,
-          "write_bps": 0.0
-        },
-        "num_fds": 17
-      },
-      "status": "running",
-      "nanny": "tcp://127.0.0.1:33027"
-    },
-    "tcp://127.0.0.1:39177": {
-      "type": "Worker",
-      "id": 2,
-      "host": "127.0.0.1",
-      "resources": {},
-      "local_directory": "/mnt/home/jbecktep/git_projects/neps/smac3_output/dask-scratch-space/worker-_u5vte31",
-      "name": 2,
-      "nthreads": 1,
-      "memory_limit": 135215072256,
-      "last_seen": 1730848615.0591109,
-      "services": {
-        "dashboard": 39395
-      },
-      "metrics": {
-        "task_counts": {},
-        "bandwidth": {
-          "total": 100000000,
-          "workers": {},
-          "types": {}
-        },
-        "digests_total_since_heartbeat": {},
-        "managed_bytes": 0,
-        "spilled_bytes": {
-          "memory": 0,
-          "disk": 0
-        },
-        "transfer": {
-          "incoming_bytes": 0,
-          "incoming_count": 0,
-          "incoming_count_total": 0,
-          "outgoing_bytes": 0,
-          "outgoing_count": 0,
-          "outgoing_count_total": 0
-        },
-        "event_loop_interval": 0.02,
-        "cpu": 0.0,
-        "memory": 188911616,
-        "time": 1730848614.95773,
-        "host_net_io": {
-          "read_bps": 93166.47212096176,
-          "write_bps": 93166.47212096176
-        },
-        "host_disk_io": {
-          "read_bps": 0.0,
-          "write_bps": 0.0
-        },
-        "num_fds": 17
-      },
-      "status": "running",
-      "nanny": "tcp://127.0.0.1:37715"
-    },
-    "tcp://127.0.0.1:41471": {
-      "type": "Worker",
-      "id": 7,
-      "host": "127.0.0.1",
-      "resources": {},
-      "local_directory": "/mnt/home/jbecktep/git_projects/neps/smac3_output/dask-scratch-space/worker-436ufd3q",
-      "name": 7,
-      "nthreads": 1,
-      "memory_limit": 135215072256,
-      "last_seen": 1730848615.4889128,
-      "services": {
-        "dashboard": 36515
-      },
-      "metrics": {
-        "task_counts": {},
-        "bandwidth": {
-          "total": 100000000,
-          "workers": {},
-          "types": {}
-        },
-        "digests_total_since_heartbeat": {},
-        "managed_bytes": 0,
-        "spilled_bytes": {
-          "memory": 0,
-          "disk": 0
-        },
-        "transfer": {
-          "incoming_bytes": 0,
-          "incoming_count": 0,
-          "incoming_count_total": 0,
-          "outgoing_bytes": 0,
-          "outgoing_count": 0,
-          "outgoing_count_total": 0
-        },
-        "event_loop_interval": 0.02,
-        "cpu": 0.0,
-        "memory": 189071360,
-        "time": 1730848615.4697983,
-        "host_net_io": {
-          "read_bps": 0.0,
-          "write_bps": 0.0
-        },
-        "host_disk_io": {
-          "read_bps": 0.0,
-          "write_bps": 0.0
-        },
-        "num_fds": 17
-      },
-      "status": "running",
-      "nanny": "tcp://127.0.0.1:44437"
-    },
-    "tcp://127.0.0.1:44685": {
+    "tcp://127.0.0.1:33687": {
       "type": "Worker",
       "id": 4,
       "host": "127.0.0.1",
       "resources": {},
-      "local_directory": "/mnt/home/jbecktep/git_projects/neps/smac3_output/dask-scratch-space/worker-_vhev6oq",
+      "local_directory": "/mnt/home/jbecktep/git_projects/neps/smac3_output/dask-scratch-space/worker-g2b4nvem",
       "name": 4,
       "nthreads": 1,
       "memory_limit": 135215072256,
-      "last_seen": 1730848614.946784,
+      "last_seen": 1730893309.014125,
       "services": {
-        "dashboard": 44781
+        "dashboard": 42067
       },
       "metrics": {
         "task_counts": {},
@@ -282,7 +27,10 @@
           "workers": {},
           "types": {}
         },
-        "digests_total_since_heartbeat": {},
+        "digests_total_since_heartbeat": {
+          "latency": 0.05595731735229492,
+          "tick-duration": 0.9814257621765137
+        },
         "managed_bytes": 0,
         "spilled_bytes": {
           "memory": 0,
@@ -297,34 +45,34 @@
           "outgoing_count_total": 0
         },
         "event_loop_interval": 0.02,
-        "cpu": 0.0,
-        "memory": 189067264,
-        "time": 1730848614.9130924,
+        "cpu": 3.3,
+        "memory": 189632512,
+        "time": 1730893308.501347,
         "host_net_io": {
-          "read_bps": 0.0,
-          "write_bps": 0.0
+          "read_bps": 2642454.410007435,
+          "write_bps": 2424206.344099133
         },
         "host_disk_io": {
           "read_bps": 0.0,
           "write_bps": 0.0
         },
-        "num_fds": 17
+        "num_fds": 18
       },
       "status": "running",
-      "nanny": "tcp://127.0.0.1:38013"
+      "nanny": "tcp://127.0.0.1:39287"
     },
-    "tcp://127.0.0.1:44775": {
+    "tcp://127.0.0.1:34825": {
       "type": "Worker",
-      "id": 5,
+      "id": 1,
       "host": "127.0.0.1",
       "resources": {},
-      "local_directory": "/mnt/home/jbecktep/git_projects/neps/smac3_output/dask-scratch-space/worker-vem22dv3",
-      "name": 5,
+      "local_directory": "/mnt/home/jbecktep/git_projects/neps/smac3_output/dask-scratch-space/worker-431_5_1i",
+      "name": 1,
       "nthreads": 1,
       "memory_limit": 135215072256,
-      "last_seen": 1730848615.0320673,
+      "last_seen": 1730893309.1743016,
       "services": {
-        "dashboard": 45451
+        "dashboard": 39465
       },
       "metrics": {
         "task_counts": {},
@@ -349,11 +97,11 @@
         },
         "event_loop_interval": 0.02,
         "cpu": 0.0,
-        "memory": 188829696,
-        "time": 1730848614.9822614,
+        "memory": 188932096,
+        "time": 1730893309.0819964,
         "host_net_io": {
-          "read_bps": 0.0,
-          "write_bps": 0.0
+          "read_bps": 16307.763920213394,
+          "write_bps": 16307.763920213394
         },
         "host_disk_io": {
           "read_bps": 0.0,
@@ -362,20 +110,74 @@
         "num_fds": 17
       },
       "status": "running",
-      "nanny": "tcp://127.0.0.1:43457"
+      "nanny": "tcp://127.0.0.1:35613"
     },
-    "tcp://127.0.0.1:46013": {
+    "tcp://127.0.0.1:36749": {
       "type": "Worker",
       "id": 6,
       "host": "127.0.0.1",
       "resources": {},
-      "local_directory": "/mnt/home/jbecktep/git_projects/neps/smac3_output/dask-scratch-space/worker-xnfuncc7",
+      "local_directory": "/mnt/home/jbecktep/git_projects/neps/smac3_output/dask-scratch-space/worker-6zzs0kbm",
       "name": 6,
       "nthreads": 1,
       "memory_limit": 135215072256,
-      "last_seen": 1730848615.1561434,
+      "last_seen": 1730893309.3220527,
       "services": {
-        "dashboard": 42875
+        "dashboard": 36761
+      },
+      "metrics": {
+        "task_counts": {},
+        "bandwidth": {
+          "total": 100000000,
+          "workers": {},
+          "types": {}
+        },
+        "digests_total_since_heartbeat": {
+          "latency": 0.025931358337402344,
+          "tick-duration": 0.9825742244720459
+        },
+        "managed_bytes": 0,
+        "spilled_bytes": {
+          "memory": 0,
+          "disk": 0
+        },
+        "transfer": {
+          "incoming_bytes": 0,
+          "incoming_count": 0,
+          "incoming_count_total": 0,
+          "outgoing_bytes": 0,
+          "outgoing_count": 0,
+          "outgoing_count_total": 0
+        },
+        "event_loop_interval": 0.02,
+        "cpu": 3.5,
+        "memory": 189612032,
+        "time": 1730893308.8117914,
+        "host_net_io": {
+          "read_bps": 1442223.5030946734,
+          "write_bps": 1321147.75679014
+        },
+        "host_disk_io": {
+          "read_bps": 0.0,
+          "write_bps": 0.0
+        },
+        "num_fds": 18
+      },
+      "status": "running",
+      "nanny": "tcp://127.0.0.1:34627"
+    },
+    "tcp://127.0.0.1:37721": {
+      "type": "Worker",
+      "id": 7,
+      "host": "127.0.0.1",
+      "resources": {},
+      "local_directory": "/mnt/home/jbecktep/git_projects/neps/smac3_output/dask-scratch-space/worker-mf7qmrh5",
+      "name": 7,
+      "nthreads": 1,
+      "memory_limit": 135215072256,
+      "last_seen": 1730893308.64415,
+      "services": {
+        "dashboard": 39033
       },
       "metrics": {
         "task_counts": {},
@@ -400,11 +202,11 @@
         },
         "event_loop_interval": 0.02,
         "cpu": 0.0,
-        "memory": 189014016,
-        "time": 1730848615.0809364,
+        "memory": 188743680,
+        "time": 1730893308.573725,
         "host_net_io": {
-          "read_bps": 85314.16538531918,
-          "write_bps": 85314.16538531918
+          "read_bps": 0.0,
+          "write_bps": 0.0
         },
         "host_disk_io": {
           "read_bps": 0.0,
@@ -413,7 +215,217 @@
         "num_fds": 17
       },
       "status": "running",
-      "nanny": "tcp://127.0.0.1:43737"
+      "nanny": "tcp://127.0.0.1:33055"
+    },
+    "tcp://127.0.0.1:40887": {
+      "type": "Worker",
+      "id": 5,
+      "host": "127.0.0.1",
+      "resources": {},
+      "local_directory": "/mnt/home/jbecktep/git_projects/neps/smac3_output/dask-scratch-space/worker-wil69k8p",
+      "name": 5,
+      "nthreads": 1,
+      "memory_limit": 135215072256,
+      "last_seen": 1730893309.3303225,
+      "services": {
+        "dashboard": 43791
+      },
+      "metrics": {
+        "task_counts": {},
+        "bandwidth": {
+          "total": 100000000,
+          "workers": {},
+          "types": {}
+        },
+        "digests_total_since_heartbeat": {},
+        "managed_bytes": 0,
+        "spilled_bytes": {
+          "memory": 0,
+          "disk": 0
+        },
+        "transfer": {
+          "incoming_bytes": 0,
+          "incoming_count": 0,
+          "incoming_count_total": 0,
+          "outgoing_bytes": 0,
+          "outgoing_count": 0,
+          "outgoing_count_total": 0
+        },
+        "event_loop_interval": 0.02,
+        "cpu": 0.0,
+        "memory": 189116416,
+        "time": 1730893309.24897,
+        "host_net_io": {
+          "read_bps": 20966.575678642024,
+          "write_bps": 20966.575678642024
+        },
+        "host_disk_io": {
+          "read_bps": 0.0,
+          "write_bps": 0.0
+        },
+        "num_fds": 17
+      },
+      "status": "running",
+      "nanny": "tcp://127.0.0.1:40817"
+    },
+    "tcp://127.0.0.1:42581": {
+      "type": "Worker",
+      "id": 3,
+      "host": "127.0.0.1",
+      "resources": {},
+      "local_directory": "/mnt/home/jbecktep/git_projects/neps/smac3_output/dask-scratch-space/worker-yrsz90kw",
+      "name": 3,
+      "nthreads": 1,
+      "memory_limit": 135215072256,
+      "last_seen": 1730893309.2010257,
+      "services": {
+        "dashboard": 35793
+      },
+      "metrics": {
+        "task_counts": {},
+        "bandwidth": {
+          "total": 100000000,
+          "workers": {},
+          "types": {}
+        },
+        "digests_total_since_heartbeat": {
+          "tick-duration": 0.499906063079834,
+          "latency": 0.004625797271728516
+        },
+        "managed_bytes": 0,
+        "spilled_bytes": {
+          "memory": 0,
+          "disk": 0
+        },
+        "transfer": {
+          "incoming_bytes": 0,
+          "incoming_count": 0,
+          "incoming_count_total": 0,
+          "outgoing_bytes": 0,
+          "outgoing_count": 0,
+          "outgoing_count_total": 0
+        },
+        "event_loop_interval": 0.022557082176208495,
+        "cpu": 2.0,
+        "memory": 189624320,
+        "time": 1730893308.6977634,
+        "host_net_io": {
+          "read_bps": 3207088.4308078764,
+          "write_bps": 2942387.760807391
+        },
+        "host_disk_io": {
+          "read_bps": 0.0,
+          "write_bps": 0.0
+        },
+        "num_fds": 18
+      },
+      "status": "running",
+      "nanny": "tcp://127.0.0.1:38341"
+    },
+    "tcp://127.0.0.1:44425": {
+      "type": "Worker",
+      "id": 0,
+      "host": "127.0.0.1",
+      "resources": {},
+      "local_directory": "/mnt/home/jbecktep/git_projects/neps/smac3_output/dask-scratch-space/worker-k6scsupy",
+      "name": 0,
+      "nthreads": 1,
+      "memory_limit": 135215072256,
+      "last_seen": 1730893308.5681882,
+      "services": {
+        "dashboard": 41213
+      },
+      "metrics": {
+        "task_counts": {},
+        "bandwidth": {
+          "total": 100000000,
+          "workers": {},
+          "types": {}
+        },
+        "digests_total_since_heartbeat": {},
+        "managed_bytes": 0,
+        "spilled_bytes": {
+          "memory": 0,
+          "disk": 0
+        },
+        "transfer": {
+          "incoming_bytes": 0,
+          "incoming_count": 0,
+          "incoming_count_total": 0,
+          "outgoing_bytes": 0,
+          "outgoing_count": 0,
+          "outgoing_count_total": 0
+        },
+        "event_loop_interval": 0.02,
+        "cpu": 0.0,
+        "memory": 188973056,
+        "time": 1730893308.5341284,
+        "host_net_io": {
+          "read_bps": 0.0,
+          "write_bps": 0.0
+        },
+        "host_disk_io": {
+          "read_bps": 0.0,
+          "write_bps": 0.0
+        },
+        "num_fds": 17
+      },
+      "status": "running",
+      "nanny": "tcp://127.0.0.1:43999"
+    },
+    "tcp://127.0.0.1:46831": {
+      "type": "Worker",
+      "id": 2,
+      "host": "127.0.0.1",
+      "resources": {},
+      "local_directory": "/mnt/home/jbecktep/git_projects/neps/smac3_output/dask-scratch-space/worker-mpeccnfw",
+      "name": 2,
+      "nthreads": 1,
+      "memory_limit": 135215072256,
+      "last_seen": 1730893309.0889542,
+      "services": {
+        "dashboard": 41805
+      },
+      "metrics": {
+        "task_counts": {},
+        "bandwidth": {
+          "total": 100000000,
+          "workers": {},
+          "types": {}
+        },
+        "digests_total_since_heartbeat": {
+          "latency": 0.01391458511352539,
+          "tick-duration": 0.9819622039794922
+        },
+        "managed_bytes": 0,
+        "spilled_bytes": {
+          "memory": 0,
+          "disk": 0
+        },
+        "transfer": {
+          "incoming_bytes": 0,
+          "incoming_count": 0,
+          "incoming_count_total": 0,
+          "outgoing_bytes": 0,
+          "outgoing_count": 0,
+          "outgoing_count_total": 0
+        },
+        "event_loop_interval": 0.02,
+        "cpu": 1.8,
+        "memory": 191680512,
+        "time": 1730893308.580262,
+        "host_net_io": {
+          "read_bps": 2855671.783488852,
+          "write_bps": 2619775.7979999525
+        },
+        "host_disk_io": {
+          "read_bps": 0.0,
+          "write_bps": 0.0
+        },
+        "num_fds": 18
+      },
+      "status": "running",
+      "nanny": "tcp://127.0.0.1:36013"
     }
   }
 }

@@ -17,6 +17,7 @@ from yahpo_gym import local_config
 def evaluate_mopb(
         OpenML_task_id: str,
         n_evaluations: int = 100,
+        eta: int = 3,
         par_ego_kwars: dict = {}
     ) -> pd.DataFrame:
     local_config.init_config()
@@ -47,6 +48,7 @@ def evaluate_mopb(
 
     mo_optimizer = neps.optimizers.multi_objective.parego.ParEGO(
         objectives=["loss", "time"],
+        eta=eta,
         **par_ego_kwars
     )
 
@@ -57,6 +59,7 @@ def evaluate_mopb(
         root_directory="results/multifidelity_priors/" + datetime_str,
         searcher="priorband",
         mo_optimizer=mo_optimizer,
+        eta=eta,
         budget=pipeline_space["epoch"].upper * n_evaluations
     )
 
@@ -69,5 +72,9 @@ def evaluate_mopb(
         "result.time": "time",
         "config.epoch": "budget"
     })
+
+    result.loc[:, "budget_used"] = result["budget"].cumsum()
+    allowed_budget = bench.get_opt_space()["epoch"].upper * n_evaluations
+    result = result[result["budget_used"] <= allowed_budget]
 
     return result
