@@ -141,11 +141,10 @@ class SuccessiveHalvingBase(BaseOptimizer):
         self.fidelities = list(self.rung_map.values())
         # stores the observations made and the corresponding fidelity explored
         # crucial data structure used for determining promotion candidates
-        self.observed_configs = pd.DataFrame([], columns=("config", "rung", "perf", "group_id"))
+        self.observed_configs = pd.DataFrame([], columns=("config", "rung", "perf"))
         # stores which configs occupy each rung at any time
         self.rung_members: dict = dict()  # stores config IDs per rung
         self.rung_members_performance: dict = dict()  # performances recorded per rung
-        self.rung_members_group_id: dict = dict()  # group_ids recorded per rung
         self.rung_promotions: dict = dict()  # records a promotable config per rung
         self.total_fevals = 0
 
@@ -227,10 +226,14 @@ class SuccessiveHalvingBase(BaseOptimizer):
     def _load_previous_observations(
         self, previous_results: dict[str, ConfigResult]
     ) -> None:
+        if self.mo_optimizer:
+            for config_id, config_val in previous_results.items():
+                _config, _rung = self._get_config_id_split(config_id)
+                self.mo_optimizer.add_config_result(config_val)
+
         for config_id, config_val in previous_results.items():
             _config, _rung = self._get_config_id_split(config_id)
             perf = self.get_loss(config_val)
-            group_id = self.mo_optimizer.get_group_id(config_id) if self.mo_optimizer else None
 
             if int(_config) in self.observed_configs.index:
                 # config already recorded in dataframe
@@ -240,10 +243,9 @@ class SuccessiveHalvingBase(BaseOptimizer):
                     self.observed_configs.at[int(_config), "config"] = config_val.config
                     self.observed_configs.at[int(_config), "rung"] = int(_rung)
                     self.observed_configs.at[int(_config), "perf"] = perf
-                    self.observed_configs.at[int(_config), "group_id"] = group_id
             else:
                 _df = pd.DataFrame(
-                    [[config_val.config, int(_rung), perf, group_id]],
+                    [[config_val.config, int(_rung), perf]],
                     columns=self.observed_configs.columns,
                     index=pd.Series(int(_config)),  # key for config_id
                 )
@@ -264,10 +266,9 @@ class SuccessiveHalvingBase(BaseOptimizer):
         # configs with the rung and performance as None
         for config_id, config in pending_evaluations.items():
             _config, _rung = self._get_config_id_split(config_id)
-            group_id = self.mo_optimizer.get_group_id(config_id) if self.mo_optimizer else None
             if int(_config) not in self.observed_configs.index:
                 _df = pd.DataFrame(
-                    [[config, int(_rung), np.nan, group_id]],
+                    [[config, int(_rung), np.nan]],
                     columns=self.observed_configs.columns,
                     index=pd.Series(int(_config)),  # key for config_id
                 )
@@ -277,13 +278,11 @@ class SuccessiveHalvingBase(BaseOptimizer):
             else:
                 self.observed_configs.at[int(_config), "rung"] = int(_rung)
                 self.observed_configs.at[int(_config), "perf"] = np.nan
-                self.observed_configs.at[int(_config), "perf"] = group_id
         return
 
     def clean_rung_information(self):
         self.rung_members = {k: [] for k in self.rung_map.keys()}
         self.rung_members_performance = {k: [] for k in self.rung_map.keys()}
-        self.rung_members_group_id = {k: [] for k in self.rung_map.keys()}
         self.rung_promotions = {k: [] for k in self.rung_map.keys()}
 
     def _get_rungs_state(self, observed_configs=None):
@@ -308,21 +307,13 @@ class SuccessiveHalvingBase(BaseOptimizer):
             idxs = observed_configs.rung == _rung
             self.rung_members[_rung] = observed_configs.index[idxs].values
             self.rung_members_performance[_rung] = observed_configs.perf[idxs].values
-            self.rung_members_group_id[_rung] = observed_configs.group_id[idxs].values
         return
 
     def _handle_promotions(self):
-        promotion_policy_kwargs = dict(
+        self.promotion_policy.set_state(
             max_rung=self.max_rung,
             members=self.rung_members,
             performances=self.rung_members_performance,
-        )
-
-        if isinstance(self.promotion_policy, ParEGOPromotionPolicy):
-            promotion_policy_kwargs["group_ids"] = self.rung_members_group_id
-
-        self.promotion_policy.set_state(
-            **promotion_policy_kwargs,
             **self.promotion_policy_kwargs,
         )
         self.rung_promotions = self.promotion_policy.retrieve_promotions()
@@ -352,7 +343,7 @@ class SuccessiveHalvingBase(BaseOptimizer):
             for rung in range(self.min_rung, self.max_rung + 1)
         }
 
-        self.observed_configs = pd.DataFrame([], columns=("config", "rung", "perf", "group_id"))
+        self.observed_configs = pd.DataFrame([], columns=("config", "rung", "perf"))
 
         # previous optimization run exists and needs to be loaded
         self._load_previous_observations(previous_results)
@@ -420,6 +411,7 @@ class SuccessiveHalvingBase(BaseOptimizer):
             [type]: [description]
         """
         rung_to_promote = self.is_promotable()
+        is_default_config = False
         if rung_to_promote is not None:
             # promotes the first recorded promotable config in the argsort-ed rung
             row = self.observed_configs.iloc[self.rung_promotions[rung_to_promote][0]]
@@ -442,6 +434,7 @@ class SuccessiveHalvingBase(BaseOptimizer):
                     # sets the default config to be evaluated at the target fidelity
                     rung_id = self.max_rung
                     self.logger.info("Next config will be evaluated at target fidelity.")
+                    is_default_config = True
                 self.logger.info("Sampling the default configuration...")
                 config = self.pipeline_space.sample_default_configuration()
 
@@ -461,7 +454,7 @@ class SuccessiveHalvingBase(BaseOptimizer):
             config_id = f"{self._generate_new_config_id()}_{rung_id}"
 
         if self.mo_optimizer is not None:
-            self.mo_optimizer.add_config(config_id)
+            self.mo_optimizer.add_config(config_id, is_default_config=is_default_config)
 
         return config.hp_values(), config_id, previous_config_id  # type: ignore
 

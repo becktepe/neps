@@ -64,26 +64,35 @@ class ParEGOPromotionPolicy(SyncPromotionPolicy):
                 )
 
                 # Now we can compute how many configurations we need to promote for each group
-                group_ids_to_promote = dict(
-                    zip(
-                        *np.unique(
-                            self.rung_members_group_ids[rung], return_counts=True
-                        )
-                    )
-                )
-
-                # We only need to promote configurations from groups that are not already in the next rung
                 group_ids_to_promote = {
-                    group_id: count // self.eta for group_id, count in group_ids_to_promote.items()}
+                    group_id: 1 for group_id in np.unique(self.rung_members_group_ids[rung])
+
+                }
+
+                if configs_to_promote != len(group_ids_to_promote):
+                    print(f"Rung {rung} configs_to_promote: {configs_to_promote}")
+                    print(f"Rung {rung} group_ids_to_promote: {group_ids_to_promote}")
+                    exit()
+
+                # First, we check how many configurations of each group are already in the next rung
+                next_rung = rung + 1
+                if next_rung in self.config_map.keys():
+                    for group_id, next_rung_count in zip(*np.unique(
+                                self.rung_members_group_ids[next_rung], return_counts=True)):
+                        group_ids_to_promote[group_id] -= next_rung_count
+
+                print(f"Rung {rung} configs_to_promote: {configs_to_promote}")
+                print(f"Rung {rung} group_ids_to_promote: {group_ids_to_promote}")
 
                 promoted_members = []  
                 if configs_to_promote == 0:
                     continue
-                elif configs_to_promote == 1 and sum(group_ids_to_promote.values()) == 0:
+                elif configs_to_promote == 1:
                     # For the final rung, we only promote the best performing configuration
                     selected_idx = np.argmin(self.rung_members_performance[rung])
                     promoted_members = [self.rung_members[rung][selected_idx]]
-                elif len(self.rung_members[rung]) > 0:
+                # elif len(self.rung_members[rung]) > 0:
+                else:
                     import pandas as pd
                     groups_and_performances = pd.DataFrame({
                         "id": self.rung_members[rung],
@@ -91,20 +100,33 @@ class ParEGOPromotionPolicy(SyncPromotionPolicy):
                         "performance": self.rung_members_performance[rung]}
                     )
 
-                    # Now we select the best performing members within each group
-                    for group_id, top_k in group_ids_to_promote.items():
+                    # Now we select the best performing member within each group
+                    selected_ids_and_performances = []
+                    for group_id, members_to_promote in group_ids_to_promote.items():
+                        if members_to_promote == 0:
+                            continue
+
                         group_members = groups_and_performances[groups_and_performances["group"] == group_id]
                         group_members = group_members.sort_values("performance", ascending=True)
-                        group_members = group_members.head(top_k)
-                        promoted_members.append(group_members["id"].values)
 
-                    if len(promoted_members) > 0:
-                        promoted_members = np.concatenate(promoted_members)
+                        selected_ids_and_performances += [{
+                            "id": group_members["id"].values[0],
+                            "performance": group_members["performance"].values[0]
+                        }]
+
+                    selected_ids_and_performances = pd.DataFrame(selected_ids_and_performances)
+                    selected_ids_and_performances = selected_ids_and_performances.sort_values("performance", ascending=True)
+                    promoted_members = selected_ids_and_performances["id"].values
 
                 self.dummy_rung_promotions[rung] = list(promoted_members)
 
         for rung in self.dummy_rung_promotions.keys():
-            assert len(self.rung_promotions[rung]) == len(self.dummy_rung_promotions[rung])
+            if not len(self.rung_promotions[rung]) == len(self.dummy_rung_promotions[rung]):
+                print(f"Rung promotions {len(self.rung_promotions[rung])}: {self.rung_promotions[rung]}")
+                print(f"Dummy rung promotions {len(self.dummy_rung_promotions[rung])}: {self.dummy_rung_promotions[rung]}")
+                print(f"Rung members: {self.rung_members}")
+                print(f"Rung performances: {self.rung_members_performance}")
+                raise ValueError("Promotions and dummy promotions do not match")
 
         return self.dummy_rung_promotions
 

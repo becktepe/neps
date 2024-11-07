@@ -2,18 +2,23 @@ import numpy as np
 from typing import Literal
 
 from neps.utils.types import ConfigResult
+from neps.optimizers.multi_objective.multi_objective_optimizer import MultiObjectiveOptimizer
 
 import logging
 logger = logging.getLogger("ParEGO")
 
-class ParEGO:
+class ParEGO(MultiObjectiveOptimizer):
     __name__ = "ParEGO"
 
-    """Class for the ParEGO multi-objective optimization algorithm."""
+    """Class for the ParEGO multi-objective optimization algorithm.
+    
+    Based on https://meta-learn.github.io/2020/papers/24_paper.pdf
+    """
     def __init__(
             self,
             objectives: list[str], 
-            eta: float = 3,
+            eta: int = 1,
+            k: int = 3,
             tchebycheff: bool = True,
             objective_bounds: list | None = None,
             weight_distribution: Literal["uniform", "dirichlet"] = "uniform"
@@ -34,10 +39,11 @@ class ParEGO:
         weight_distribution : Literal["uniform", "dirichlet"], optional
             Distribution to sample weights from, by default "uniform".
         """
-        logger.info("Initializing ParEGO.")
+        super().__init__(objectives)
 
-        self._objectives = objectives
+        logger.info("Initializing ParEGO.")
         self._eta = eta
+        self._k = k
         self._tchebycheff = tchebycheff
         self._weight_distribution = weight_distribution
         self._config_weights = {}
@@ -74,15 +80,16 @@ class ParEGO:
 
     def _normalize_weights(self, weights: np.ndarray) -> np.ndarray:
         """Normalize the weights."""
-        return weights / (np.sum(weights) + 1e-10)
+        return weights / np.sum(weights, axis=0)
 
     def _sample_weights(self) -> np.ndarray:
         """Sample weights for the objectives."""
         if self._weight_distribution == "uniform":
-            weights = np.random.rand(len(self._objectives))
+            # Sample len(self._objectives) x k weights
+            weights = np.random.uniform(size=(len(self._objectives), self._k))
         else:
-            weights = np.random.dirichlet(np.ones(len(self._objectives)))
-
+            weights = np.random.dirichlet(alpha=np.ones(shape=(len(self._objectives), self._k)))
+            
         normalized_weights = self._normalize_weights(weights)
 
         return normalized_weights
@@ -103,7 +110,7 @@ class ParEGO:
         config_id = self._extract_config_id(config_id)
         return self._config_groups[config_id]
     
-    def add_config(self, config_id: str) -> None:
+    def add_config(self, config_id: str, is_default_config: bool = False) -> None:
         """Add a configuration to the optimizer."""
         config_id = self._extract_config_id(config_id)
 
@@ -115,7 +122,7 @@ class ParEGO:
             logger.info(f"Added configuration {config_id} to ParEGO.")
 
             # This ensure that we have groups of <eta> configurations
-            if len(self._config_weights) % self._eta == 0:
+            if len(self._config_weights) % self._eta == 1 or is_default_config:
                 self._next_group()
         
         # Configurations that we have already seen keep their weights 
@@ -123,12 +130,22 @@ class ParEGO:
         else:
             logger.info(f"Configuration {config_id} already exists in ParEGO.")
 
-    def scalarize_result(self, config_result: ConfigResult) -> float:
+    def add_config_result(self, config_result: ConfigResult) -> None:
+        """Register the result of a config to update the objective bounds."""
+        if not isinstance(config_result.result, dict):
+            raise ValueError("ConfigResult.result should be a dictionary.")
+        
+        objectives = np.array([config_result.result[objective] for objective in self._objectives])
+        self._update_objective_bounds(objectives)
+
+    def get_result(self, config_result: ConfigResult, rung: int | None = None) -> float:
         """Scalarize the result of a configuration."""
         if not isinstance(config_result.result, dict):
             raise ValueError("ConfigResult.result should be a dictionary.")
         
         objectives = np.array([config_result.result[objective] for objective in self._objectives])
+        
+        # Just in case add_config_result() was not called
         self._update_objective_bounds(objectives)
 
         normalized_objectives = self._normalize_objectives(objectives)
@@ -136,10 +153,11 @@ class ParEGO:
         config_id = self._extract_config_id(config_result.id)
         weights = self._config_weights[config_id]
 
-        weighted_objectives = normalized_objectives * weights
+        weighted_objectives = normalized_objectives * weights.T
 
-        # SMAC ParEGO
         if self._tchebycheff:
-            return float(np.max(weighted_objectives, axis=0) + 0.05 * np.sum(weighted_objectives, axis=0))
+            scalarized_objectives = np.max(weighted_objectives, axis=1) + 0.05 * np.sum(weighted_objectives, axis=1)
         else:
-            return float(np.sum(weighted_objectives))
+            scalarized_objectives = np.sum(weighted_objectives)
+
+        return float(np.min(scalarized_objectives))

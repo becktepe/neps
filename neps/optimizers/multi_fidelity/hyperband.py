@@ -115,17 +115,10 @@ class HyperbandBase(SuccessiveHalvingBase):
         return
 
     def _handle_promotions(self):
-        promotion_policy_kwargs = dict(
+        self.promotion_policy.set_state(
             max_rung=self.max_rung,
             members=self.rung_members,
             performances=self.rung_members_performance,
-        )
-
-        if isinstance(self.promotion_policy, ParEGOPromotionPolicy):
-            promotion_policy_kwargs["group_ids"] = self.rung_members_group_id
-
-        self.promotion_policy.set_state(
-            **promotion_policy_kwargs,
             **self.promotion_policy_kwargs,
         )
         # promotions are handled by the individual SH brackets which are explicitly

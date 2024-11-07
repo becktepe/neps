@@ -5,10 +5,13 @@ import numpy as np
 import neps
 import neps.optimizers
 import neps.optimizers.multi_objective
-import neps.optimizers.multi_objective.parego
+from neps.optimizers.multi_objective.multi_objective_optimizer import MultiObjectiveOptimizer
+from neps.optimizers.multi_objective.parego import ParEGO
+from neps.optimizers.multi_objective.epsnet import EpsNet
 import pandas as pd
 
 from neps.search_spaces.search_space import pipeline_space_from_configspace
+
 
 from yahpo_gym import benchmark_set
 from yahpo_gym import local_config
@@ -18,7 +21,8 @@ def evaluate_mopb(
         OpenML_task_id: str,
         n_evaluations: int = 100,
         eta: int = 3,
-        par_ego_kwars: dict = {}
+        mo_optimizer_cls: type[MultiObjectiveOptimizer] = ParEGO,
+        mo_optimizer_kwargs: dict = {}
     ) -> pd.DataFrame:
     local_config.init_config()
 
@@ -46,10 +50,10 @@ def evaluate_mopb(
     # Get datetime string
     datetime_str = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
 
-    mo_optimizer = neps.optimizers.multi_objective.parego.ParEGO(
+    
+    mo_optimizer = mo_optimizer_cls(
         objectives=["loss", "time"],
-        eta=eta,
-        **par_ego_kwars
+        **mo_optimizer_kwargs
     )
 
     logging.basicConfig(level=logging.INFO)
@@ -72,9 +76,5 @@ def evaluate_mopb(
         "result.time": "time",
         "config.epoch": "budget"
     })
-
-    result.loc[:, "budget_used"] = result["budget"].cumsum()
-    allowed_budget = bench.get_opt_space()["epoch"].upper * n_evaluations
-    result = result[result["budget_used"] <= allowed_budget]
 
     return result

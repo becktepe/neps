@@ -84,13 +84,13 @@ class BaseOptimizer:
     def get_loss(self, config_result: ConfigResult) -> float | Any:
         """Calls result.utils.get_loss() and passes the error handling through.
         Please use self.get_loss() instead of get_loss() in all optimizer classes."""
-        if self.mo_optimizer and not config_result.result == "error":
+        if self.mo_optimizer and config_result.result != "error":
             if not isinstance(config_result.result, dict):
                 raise ValueError(
                     "Multi-objective optimization requires a dictionary result"
                 )
             
-            result = self.mo_optimizer.scalarize_result(config_result)
+            result = self.mo_optimizer.get_result(config_result)
 
             return _get_loss(
                 result,

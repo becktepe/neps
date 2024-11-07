@@ -6,7 +6,9 @@ import neps
 import neps.optimizers
 import neps.optimizers.multi_objective
 from neps.optimizers.multi_objective.parego import ParEGO
+from neps.optimizers.multi_objective.epsnet import EpsNet
 from neps.optimizers.multi_objective.parego_promotion_policy import ParEGOPromotionPolicy
+from neps.optimizers.multi_objective.epsnet_promotion_policy import EpsNetPromotionPolicy
 
 
 
@@ -34,7 +36,8 @@ import datetime as datetime
 # Get datetime string
 datetime_str = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
 
-mo_optimizer = ParEGO(objectives=["loss", "loss2"])
+# mo_optimizer = ParEGO(objectives=["loss", "loss2"])
+mo_optimizer = EpsNet(objectives=["loss", "loss2"])
 
 logging.basicConfig(level=logging.ERROR)
 neps.run(
@@ -44,8 +47,7 @@ neps.run(
     max_evaluations_total=25,  # For an alternate stopping method see multi_fidelity.py,
     searcher="priorband",
     mo_optimizer=mo_optimizer,
-    promotion_policy=ParEGOPromotionPolicy,
-
+    promotion_policy=EpsNetPromotionPolicy,
 )
 
 import pandas as pd
