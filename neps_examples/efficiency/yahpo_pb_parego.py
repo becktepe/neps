@@ -5,12 +5,10 @@ import numpy as np
 import neps
 import neps.optimizers
 import neps.optimizers.multi_objective
-from neps.optimizers.multi_objective.multi_objective_optimizer import MultiObjectiveOptimizer
-from neps.optimizers.multi_objective.parego import ParEGO
-from neps.optimizers.multi_objective.epsnet import EpsNet
+from neps.optimizers.multi_objective.mo_priorband import MOPriorBand
 import pandas as pd
 
-from neps.search_spaces.search_space import pipeline_space_from_configspace
+from neps.search_spaces.search_space import pipeline_space_from_configspace, SearchSpace
 
 
 from yahpo_gym import benchmark_set
@@ -21,8 +19,6 @@ def evaluate_mopb(
         OpenML_task_id: str,
         n_evaluations: int = 100,
         eta: int = 3,
-        mo_optimizer_cls: type[MultiObjectiveOptimizer] = ParEGO,
-        mo_optimizer_kwargs: dict = {}
     ) -> pd.DataFrame:
     local_config.init_config()
 
@@ -32,6 +28,7 @@ def evaluate_mopb(
     pipeline_space = pipeline_space_from_configspace(bench.get_opt_space())
     pipeline_space.pop("OpenML_task_id")
     pipeline_space["epoch"].is_fidelity = True
+    pipeline_space = SearchSpace(**pipeline_space)
 
     def run_pipeline(**config):
         config["OpenML_task_id"] = OpenML_task_id
@@ -50,10 +47,11 @@ def evaluate_mopb(
     # Get datetime string
     datetime_str = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
 
-    
-    mo_optimizer = mo_optimizer_cls(
+    searcher = MOPriorBand(
+        pipeline_space=pipeline_space,
+        budget=pipeline_space["epoch"].upper * n_evaluations,
         objectives=["loss", "time"],
-        **mo_optimizer_kwargs
+        eta=eta,
     )
 
     logging.basicConfig(level=logging.INFO)
@@ -61,12 +59,9 @@ def evaluate_mopb(
         run_pipeline=run_pipeline,
         pipeline_space=pipeline_space,
         root_directory="results/multifidelity_priors/" + datetime_str,
-        searcher="priorband",
-        mo_optimizer=mo_optimizer,
-        eta=eta,
-        budget=pipeline_space["epoch"].upper * n_evaluations
+        searcher=searcher,
+        budget=pipeline_space["epoch"].upper * n_evaluations,
     )
-
 
     result = pd.read_csv(f"results/multifidelity_priors/{datetime_str}/summary_csv/config_data.csv")
     result["id"] = np.arange(len(result))

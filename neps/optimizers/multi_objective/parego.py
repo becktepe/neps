@@ -57,6 +57,8 @@ class ParEGO(MultiObjectiveOptimizer):
         if objective_bounds is None:
             # List of (min, max) tuples for each objective
             self._objective_bounds = [(None, None)] * len(objectives)
+        else:
+            self._objective_bounds = objective_bounds
 
     def _update_objective_bounds(self, objectives: np.ndarray) -> None:
         """Update the bounds of the objectives."""
@@ -138,7 +140,7 @@ class ParEGO(MultiObjectiveOptimizer):
         objectives = np.array([config_result.result[objective] for objective in self._objectives])
         self._update_objective_bounds(objectives)
 
-    def get_result(self, config_result: ConfigResult, rung: int | None = None) -> float:
+    def get_result(self, config_result: ConfigResult) -> float:
         """Scalarize the result of a configuration."""
         if not isinstance(config_result.result, dict):
             raise ValueError("ConfigResult.result should be a dictionary.")

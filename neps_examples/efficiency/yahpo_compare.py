@@ -8,6 +8,7 @@ import random
 from neps.optimizers.multi_objective.parego_promotion_policy import ParEGOPromotionPolicy
 from neps.optimizers.multi_objective.parego import ParEGO
 from neps.optimizers.multi_objective.epsnet import EpsNet
+from neps.optimizers.multi_objective.mo_sample_policy import MOEnsemblePolicy
 
 from neps_examples.efficiency.yahpo_pb_parego import evaluate_mopb
 from neps_examples.efficiency.yahpo_smac import evaluate_smac
@@ -25,28 +26,19 @@ random.seed(SEED)
 
 
 for n_evaluations in N_EVALUATIONS:
-    result_parego_pb = evaluate_mopb(
-        OPENML_TASK_ID,
-        n_evaluations,
-        eta=ETA,
-        mo_optimizer_cls=ParEGO,
-        mo_optimizer_kwargs={"k": 3},
-    )
     result_parego_epsnet = evaluate_mopb(
         OPENML_TASK_ID,
         n_evaluations,
         eta=ETA,
-        mo_optimizer_cls=EpsNet
     )
     result_smac = evaluate_smac(OPENML_TASK_ID, n_evaluations)
     result_smac_mf = evaluate_smac_mf(OPENML_TASK_ID, n_evaluations, eta=ETA)
 
-    result_parego_pb["Approach"] = "ParEGO + PriorBand"
-    result_parego_epsnet["Approach"] = "EpsNet + PriorBand"
+    result_parego_epsnet["Approach"] = "MOPriorBand"
     result_smac["Approach"] = "SMAC"
     result_smac_mf["Approach"] = "SMAC MF"
 
-    result = pd.concat([result_parego_pb, result_parego_epsnet, result_smac, result_smac_mf])
+    result = pd.concat([result_parego_epsnet, result_smac, result_smac_mf])
 
     plt.figure(figsize=(10,6))
     plt.title(f"OpenML task {OPENML_TASK_ID}, {n_evaluations} evaluations")
