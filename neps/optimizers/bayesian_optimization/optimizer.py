@@ -234,7 +234,7 @@ class BayesianOptimization(BaseOptimizer):
         pending_evaluations: dict[str, SearchSpace],
     ) -> None:
         train_x = [el.config for el in previous_results.values()]
-        train_y = [self.get_loss(el.result) for el in previous_results.values()]
+        train_y = [self.get_loss(el) for el in previous_results.values()]
         if self.ignore_errors:
             train_x = [x for x, y in zip(train_x, train_y) if y != "error"]
             train_y_no_error = [y for y in train_y if y != "error"]

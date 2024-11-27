@@ -266,20 +266,28 @@ class GraphGrammar(GraphParameter, CoreGraphGrammar):
             parent = self
         parent_string_tree = parent.string_tree
 
-        if mutation_strategy == "bananas":
-            child_string_tree, is_same = bananas_mutate(
-                parent_string_tree=parent_string_tree,
-                grammar=self.grammars[0],
-                mutation_rate=mutation_rate,
-            )
-        else:
-            child_string_tree, is_same = simple_mutate(
-                parent_string_tree=parent_string_tree,
-                grammar=self.grammars[0],
-            )
+        # We have 10 trials to mutate the parent,
+        # if we can't mutate it in 10 trials, we raise an exception
+        trials = 10
+        while True:
+            if mutation_strategy == "bananas":
+                child_string_tree, is_same = bananas_mutate(
+                    parent_string_tree=parent_string_tree,
+                    grammar=self.grammars[0],
+                    mutation_rate=mutation_rate,
+                )
+            else:
+                child_string_tree, is_same = simple_mutate(
+                    parent_string_tree=parent_string_tree,
+                    grammar=self.grammars[0],
+                )
 
-        if is_same:
-            raise Exception("Parent is the same as child!")
+            if is_same:
+                trials -= 1
+                if trials == 0:
+                    raise Exception("Cannot create mutation")
+            else:
+                break
 
         return parent.create_new_instance_from_id(
             self.string_tree_to_id(child_string_tree)

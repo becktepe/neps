@@ -810,7 +810,6 @@ class CoreGraphGrammar(Graph):
         Returns:
             nx.DiGraph: [description]
         """
-
         def get_node_labels(graph: nx.DiGraph):
             return [
                 (n, d[sym_name])

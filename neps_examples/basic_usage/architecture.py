@@ -94,7 +94,7 @@ def run_pipeline(architecture):
     base_channels = 16
     n_classes = 10
     out_channels_factor = 4
-
+    
     # E.g., in shape = (N, 3, 32, 32) => out shape = (N, 10)
     model = architecture.to_pytorch()
     model = nn.Sequential(

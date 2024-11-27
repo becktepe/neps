@@ -826,7 +826,10 @@ class SearchSpace(Mapping[str, Any]):
                     current_hp.set_default_confidence_score(confidence)
 
             if values:
-                current_hp.set_value(new_hp_value)
+                if isinstance(current_hp, GraphParameter):
+                    current_hp.set_value(new_hp_value.string_tree)
+                else:   
+                    current_hp.set_value(new_hp_value)
 
     def __getitem__(self, key: str) -> Parameter:
         return self.hyperparameters[key]
