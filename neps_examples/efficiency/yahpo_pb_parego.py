@@ -19,6 +19,7 @@ def evaluate_mopb(
         OpenML_task_id: str,
         n_evaluations: int = 100,
         eta: int = 3,
+        **searcher_kwargs
     ) -> pd.DataFrame:
     local_config.init_config()
 
@@ -52,6 +53,7 @@ def evaluate_mopb(
         budget=pipeline_space["epoch"].upper * n_evaluations,
         objectives=["loss", "time"],
         eta=eta,
+        **searcher_kwargs
     )
 
     logging.basicConfig(level=logging.INFO)

@@ -26,19 +26,28 @@ random.seed(SEED)
 
 
 for n_evaluations in N_EVALUATIONS:
-    result_parego_epsnet = evaluate_mopb(
+    result_parego_epsnet_inc = evaluate_mopb(
         OPENML_TASK_ID,
         n_evaluations,
         eta=ETA,
+        incumbent_selection="pareto_front",
+        reference_point=[-30, 60]
+    )
+    result_parego_epsnet_hyperv = evaluate_mopb(
+        OPENML_TASK_ID,
+        n_evaluations,
+        eta=ETA,
+        incumbent_selection="hypervolume",
     )
     result_smac = evaluate_smac(OPENML_TASK_ID, n_evaluations)
     result_smac_mf = evaluate_smac_mf(OPENML_TASK_ID, n_evaluations, eta=ETA)
 
-    result_parego_epsnet["Approach"] = "MOPriorBand"
+    result_parego_epsnet_inc["Approach"] = "MOPriorBand IncSamp"
+    result_parego_epsnet_hyperv["Approach"] = "MOPriorBand HyperV"
     result_smac["Approach"] = "SMAC"
     result_smac_mf["Approach"] = "SMAC MF"
 
-    result = pd.concat([result_parego_epsnet, result_smac, result_smac_mf])
+    result = pd.concat([result_parego_epsnet_inc, result_parego_epsnet_hyperv, result_smac, result_smac_mf])
 
     plt.figure(figsize=(10,6))
     plt.title(f"OpenML task {OPENML_TASK_ID}, {n_evaluations} evaluations")

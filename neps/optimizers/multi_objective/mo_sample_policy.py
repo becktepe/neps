@@ -50,18 +50,19 @@ class MOEnsemblePolicy(EnsemblePolicy):
         assert inc_type == "mutation"
 
     def sample(
-        self, inc: list[SearchSpace] = None, weights: dict[str, float] = None, *args, **kwargs
+        self, inc: list[SearchSpace] | SearchSpace | None = None, weights: dict[str, float] = None, *args, **kwargs
     ) -> SearchSpace:
         """Samples from the prior with a certain probability
 
         Returns:
             SearchSpace: [description]
         """
-        if inc is None:
-            incumbent = None
+        if isinstance(inc, SearchSpace) or inc is None:
+            return super().sample(incumbent=inc, weights=weights, *args, **kwargs)
         else:
+            assert isinstance(inc, list)
             # We select on incumbent randomly
             inc_idx = np.random.choice(len(inc))
             incumbent = inc[inc_idx]
-
-        return super().sample(incumbent=incumbent, weights=weights, *args, **kwargs)
+        
+            return super().sample(incumbent=incumbent, weights=weights, *args, **kwargs)

@@ -28,6 +28,8 @@ class MOPriorBand(PriorBand):
             budget: int,
             objectives: list[str],
             mo_optimizer: type[MultiObjectiveOptimizer] = EpsNet,
+            incumbent_selection: Literal["hypervolume", "pareto_front"] = "hypervolume",
+            reference_point: list[float] | None = None,
             eta: int = 3,
             initial_design_type: Literal["max_budget", "unique_configs"] = "max_budget",
             sampling_policy: typing.Any = MOEnsemblePolicy,
@@ -90,7 +92,8 @@ class MOPriorBand(PriorBand):
             log_prior_weighted=log_prior_weighted,
             acquisition_sampler=acquisition_sampler,
         )
-        self.mo_optimizer = mo_optimizer(objectives=objectives)
+        self.mo_optimizer = mo_optimizer(objectives=objectives, reference_point=reference_point)
+        self.incumbent_selection = incumbent_selection
 
     def set_sampling_weights_and_inc(self, rung: int):
         sampling_args = self.calc_sampling_args(rung)
@@ -114,9 +117,19 @@ class MOPriorBand(PriorBand):
                         "Multi-objective optimization only supports MOEnsemblePolicy. "
                         "Please set `sampling_policy=MOEnsemblePolicy`."
                     )
-                inc = self.mo_optimizer.get_pareto_front()
-                self.logger.info("Using Pareto front as incumbent.")
-                self.logger.info(f"Incumbent: {inc}")
+                
+                if self.incumbent_selection == "hypervolume":
+                    inc = self.mo_optimizer.get_incumbent()
+                    self.logger.info("Using hypervolume as incumbent.")
+                    self.logger.info(f"Incumbent: {inc}")
+                elif self.incumbent_selection == "pareto_front":
+                    inc = self.mo_optimizer.get_pareto_front()
+                    self.logger.info("Using Pareto front as incumbent.")
+                    self.logger.info(f"Incumbent: {inc}")
+                else:
+                    raise ValueError(
+                        f"Invalid incumbent selection method: {self.incumbent_selection}"
+                    )
             else:
                 inc = self.find_incumbent()
 

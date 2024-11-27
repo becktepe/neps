@@ -88,8 +88,15 @@ def get_architecture() -> neps.ArchitectureParameter:
         out_channels = in_channels * 2 if op_name == "DownSampleBlock" else in_channels
         return dict(in_channels=in_channels, out_channels=out_channels)
     
+    prior_distr = {
+        "S": [1],
+        "C": [1],
+        "OPS": [1/4, 1/4, 1/4, 1/4],
+    }
+        
     return neps.ArchitectureParameter(
         set_recursive_attribute=set_recursive_attribute,
         structure=structure,
         primitives=primitives,
+        prior=prior_distr
     )

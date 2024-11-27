@@ -1,8 +1,10 @@
 from abc import ABC, abstractmethod
 from typing import Any
 
-from neps.utils.types import ConfigResult
+import numpy as np
 
+from neps.utils.types import ConfigResult
+from neps.search_spaces.search_space import SearchSpace
 
 class MultiObjectiveOptimizer(ABC):
     __name__ = "MultiObjectiveOptimizer"
@@ -10,7 +12,8 @@ class MultiObjectiveOptimizer(ABC):
     """Base class for an multi-objective optimization algorithm."""
     def __init__(
             self,
-            objectives: list[str]
+            objectives: list[str],
+            reference_point: list[float] | None = None,
         ) -> None:
         """
         Initialize an MultiObjective optimizer.
@@ -21,6 +24,7 @@ class MultiObjectiveOptimizer(ABC):
             List of objectives to optimize.
         """
         self._objectives = objectives
+        self._reference_point = reference_point or [0.0] * len(objectives)
         self._all_results: dict[str, ConfigResult] = {}
 
     def _non_dominated_sorting(self, configs: dict[Any, ConfigResult]) -> list[list[Any]]:
@@ -58,12 +62,44 @@ class MultiObjectiveOptimizer(ABC):
 
         return fronts
     
-    def get_pareto_front(self) -> list[ConfigResult]:
-        """Get the Pareto front."""
+    def _get_pareto_front(self) -> list[ConfigResult]:
+        """Get the Pareto front containing ConfigResults."""
         fronts = self._non_dominated_sorting(self._all_results)
 
         pareto_front = [self._all_results[config_id] for config_id in fronts[0]]
         return pareto_front
+    
+    def get_pareto_front(self) -> list[SearchSpace]:
+        """Get the Pareto front containing actual configurations."""
+        pareto_front = self._get_pareto_front()
+
+        return [c.config for c in pareto_front]
+    
+    def get_incumbent(self) -> SearchSpace:
+        """Compute the incumbent configuration based on the hypervolume."""
+        pareto_front = self._get_pareto_front()
+        
+        incumbent_config = None
+        incumbent_hypervolume = -np.inf
+
+        hypervolumes = []
+
+        for config_result in pareto_front:
+            if config_result.result == "error":
+                continue
+
+            objectives = [config_result.result[objective] for objective in self._objectives]
+            hypervolume = np.prod([self._reference_point[i] - objectives[i] for i in range(len(objectives))])
+            hypervolumes.append(hypervolume)
+
+            if hypervolume > incumbent_hypervolume:
+                incumbent_config = config_result.config
+                incumbent_hypervolume = hypervolume
+        
+        if incumbent_config is None:
+            raise ValueError("No incumbent found.")
+        
+        return incumbent_config
 
     @abstractmethod
     def add_config(self, config_id: str, is_default_config: bool = False) -> None:

@@ -15,6 +15,7 @@ class EpsNet(MultiObjectiveOptimizer):
     def __init__(
             self,
             objectives: list[str],
+            reference_point: list[float] | None = None,
         ) -> None:
         """
         Initialize the EpsNet optimizer.
@@ -23,16 +24,10 @@ class EpsNet(MultiObjectiveOptimizer):
         ----------
         objectives : list[str]
             List of objectives to optimize.
-        eta : float, optional
-            Number of configurations to sample before resampling weights, by default 3.
-        tchebycheff : bool, optional
-            Whether to use the Tchebycheff scalarization function, by default True.
-        objective_bounds : list | None, optional
-            List of (min, max) tuples for each objective, by default None.
-        weight_distribution : Literal["uniform", "dirichlet"], optional
-            Distribution to sample weights from, by default "uniform".
+        reference_point : list[float] | None
+            Reference point for the hypervolume calculation. Defaults to [0.0] * len(objectives).
         """
-        super().__init__(objectives)
+        super().__init__(objectives=objectives, reference_point=reference_point)
 
         logger.info("Initializing EpsNet.")
         self._results_per_rung = defaultdict(dict)
@@ -61,13 +56,6 @@ class EpsNet(MultiObjectiveOptimizer):
         r2 = np.array(list(result2.result.values()))
 
         return float(np.linalg.norm(r1 - r2))
-    
-    def get_pareto_front(self) -> list[SearchSpace]:
-        """Get the Pareto front."""
-        fronts = self._non_dominated_sorting(self._all_results)
-
-        pareto_front = [self._all_results[config_id].config for config_id in fronts[0]]
-        return pareto_front
 
     def get_result(self, config_result: ConfigResult) -> float:
         """Get the result of a configuration."""
