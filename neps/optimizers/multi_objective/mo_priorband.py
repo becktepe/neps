@@ -17,8 +17,7 @@ from neps.optimizers.multi_fidelity.promotion_policy import SyncPromotionPolicy
 from neps.optimizers.multi_fidelity.sampling_policy import ModelPolicy
 from neps.optimizers.multi_objective.mo_sample_policy import MOEnsemblePolicy
 from neps.optimizers.multi_objective.multi_objective_optimizer import MultiObjectiveOptimizer
-from neps.optimizers.multi_objective.epsnet import EpsNet
-from neps.optimizers.multi_objective.parego import ParEGO
+from neps.optimizers.multi_objective.nsga_ii import NSGAII
 
 
 class MOPriorBand(PriorBand):
@@ -27,7 +26,7 @@ class MOPriorBand(PriorBand):
             pipeline_space: SearchSpace,
             budget: int,
             objectives: list[str],
-            mo_optimizer: type[MultiObjectiveOptimizer] = EpsNet,
+            mo_optimizer: type[MultiObjectiveOptimizer] = NSGAII,
             incumbent_selection: Literal["hypervolume", "pareto_front"] = "hypervolume",
             reference_point: list[float] | None = None,
             eta: int = 3,
@@ -104,8 +103,6 @@ class MOPriorBand(PriorBand):
 
             self.sampling_args = {"inc": inc, "weights": sampling_args}
         else:
-            # For multi-objective optimization, the incumbent should be the
-            # Pareto front, not the best performing configuration.
             if self.mo_optimizer is not None:
                 if self.inc_sample_type != "mutation":
                     raise ValueError(
@@ -118,6 +115,10 @@ class MOPriorBand(PriorBand):
                         "Please set `sampling_policy=MOEnsemblePolicy`."
                     )
                 
+                # Here, we either sample a single point with highest
+                # hypervolume or the Pareto front. For the latter,
+                # the sampling policy will randomly pick a point from
+                # the Pareto front for each sampled configuration
                 if self.incumbent_selection == "hypervolume":
                     inc = self.mo_optimizer.get_incumbent()
                     self.logger.info("Using hypervolume as incumbent.")

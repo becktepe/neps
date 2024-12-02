@@ -26,6 +26,15 @@ class MultiObjectiveOptimizer(ABC):
         self._objectives = objectives
         self._reference_point = reference_point or [0.0] * len(objectives)
         self._all_results: dict[str, ConfigResult] = {}
+        self._objective_bounds = {objective: (np.inf, -np.inf) for objective in objectives}
+
+    def _normalize_objective(self, objective: str, value: float) -> float:
+        """Normalize the objective value."""
+        lower, upper = self._objective_bounds[objective]
+        if np.isinf(lower) or np.isinf(upper) or lower == upper:
+            return value
+
+        return (value - lower) / (upper - lower)
 
     def _non_dominated_sorting(self, configs: dict[Any, ConfigResult]) -> list[list[Any]]:
         """Get the non-dominated configurations."""
@@ -75,22 +84,28 @@ class MultiObjectiveOptimizer(ABC):
 
         return [c.config for c in pareto_front]
     
+    def _compute_hypervolume(self, config_result: ConfigResult) -> float:
+        if config_result.result == "error":
+            return 0
+
+        objective_values = [
+            self._normalize_objective(
+                objective,
+                config_result.result[objective]
+            ) for objective in self._objectives
+        ]
+
+        return float(np.prod([self._reference_point[i] - objective_values[i] for i in range(len(objective_values))]))
+
     def get_incumbent(self) -> SearchSpace:
         """Compute the incumbent configuration based on the hypervolume."""
         pareto_front = self._get_pareto_front()
-        
+
         incumbent_config = None
         incumbent_hypervolume = -np.inf
 
-        hypervolumes = []
-
         for config_result in pareto_front:
-            if config_result.result == "error":
-                continue
-
-            objectives = [config_result.result[objective] for objective in self._objectives]
-            hypervolume = np.prod([self._reference_point[i] - objectives[i] for i in range(len(objectives))])
-            hypervolumes.append(hypervolume)
+            hypervolume = self._compute_hypervolume(config_result)
 
             if hypervolume > incumbent_hypervolume:
                 incumbent_config = config_result.config
@@ -111,6 +126,13 @@ class MultiObjectiveOptimizer(ABC):
         if not isinstance(config_result.result, dict):
             raise ValueError("ConfigResult.result should be a dictionary.")
         self._all_results[config_result.id] = config_result
+        self._objective_bounds = {
+            objective: (
+                min(self._objective_bounds[objective][0], config_result.result[objective]),
+                max(self._objective_bounds[objective][1], config_result.result[objective]),
+            )
+            for objective in self._objectives
+        }
 
     @abstractmethod
     def get_result(self, config_result: ConfigResult) -> float:
