@@ -31,7 +31,6 @@ for n_evaluations in N_EVALUATIONS:
         n_evaluations,
         eta=ETA,
         incumbent_selection="hypervolume",
-        reference_point=[-30, 60]
     )
     result_smac = evaluate_smac(OPENML_TASK_ID, n_evaluations)
     result_smac_mf = evaluate_smac_mf(OPENML_TASK_ID, n_evaluations, eta=ETA)

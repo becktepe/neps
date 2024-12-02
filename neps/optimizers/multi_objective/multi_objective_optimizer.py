@@ -13,7 +13,6 @@ class MultiObjectiveOptimizer(ABC):
     def __init__(
             self,
             objectives: list[str],
-            reference_point: list[float] | None = None,
         ) -> None:
         """
         Initialize an MultiObjective optimizer.
@@ -24,9 +23,12 @@ class MultiObjectiveOptimizer(ABC):
             List of objectives to optimize.
         """
         self._objectives = objectives
-        self._reference_point = reference_point or [0.0] * len(objectives)
         self._all_results: dict[str, ConfigResult] = {}
         self._objective_bounds = {objective: (np.inf, -np.inf) for objective in objectives}
+
+        # Through normalization the values are transformed to the range [0, 1],
+        # so we set the reference point to be slightly above 1.
+        self._reference_point = [1.1] * len(objectives)
 
     def _normalize_objective(self, objective: str, value: float) -> float:
         """Normalize the objective value."""

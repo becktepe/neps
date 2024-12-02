@@ -27,7 +27,7 @@ class NSGAII(MultiObjectiveOptimizer):
         reference_point : list[float] | None
             Reference point for the hypervolume calculation. Defaults to [0.0] * len(objectives).
         """
-        super().__init__(objectives=objectives, reference_point=reference_point)
+        super().__init__(objectives=objectives)
 
         logger.info("Initializing NSGA-II based MO-optimizer.")
         self._results_per_rung = defaultdict(dict)

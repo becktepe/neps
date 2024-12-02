@@ -28,7 +28,6 @@ class MOPriorBand(PriorBand):
             objectives: list[str],
             mo_optimizer: type[MultiObjectiveOptimizer] = NSGAII,
             incumbent_selection: Literal["hypervolume", "pareto_front"] = "hypervolume",
-            reference_point: list[float] | None = None,
             eta: int = 3,
             initial_design_type: Literal["max_budget", "unique_configs"] = "max_budget",
             sampling_policy: typing.Any = MOEnsemblePolicy,
@@ -91,7 +90,7 @@ class MOPriorBand(PriorBand):
             log_prior_weighted=log_prior_weighted,
             acquisition_sampler=acquisition_sampler,
         )
-        self.mo_optimizer = mo_optimizer(objectives=objectives, reference_point=reference_point)
+        self.mo_optimizer = mo_optimizer(objectives=objectives)
         self.incumbent_selection = incumbent_selection
 
     def set_sampling_weights_and_inc(self, rung: int):
