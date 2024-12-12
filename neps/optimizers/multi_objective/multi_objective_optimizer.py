@@ -86,7 +86,7 @@ class MultiObjectiveOptimizer(ABC):
 
         return [c.config for c in pareto_front]
     
-    def _compute_hypervolume(self, config_result: ConfigResult) -> float:
+    def _compute_area(self, config_result: ConfigResult) -> float:
         if config_result.result == "error":
             return 0
 
@@ -97,21 +97,21 @@ class MultiObjectiveOptimizer(ABC):
             ) for objective in self._objectives
         ]
 
-        return float(np.prod([self._reference_point[i] - objective_values[i] for i in range(len(objective_values))]))
+        return float(np.prod([np.abs(self._reference_point[i] - objective_values[i]) for i in range(len(objective_values))]))
 
     def get_incumbent(self) -> SearchSpace:
-        """Compute the incumbent configuration based on the hypervolume."""
+        """Compute the incumbent configuration based on the area spanned by configuration and reference point."""
         pareto_front = self._get_pareto_front()
 
         incumbent_config = None
-        incumbent_hypervolume = -np.inf
+        incumbent_area = -np.inf
 
         for config_result in pareto_front:
-            hypervolume = self._compute_hypervolume(config_result)
+            area = self._compute_area(config_result)
 
-            if hypervolume > incumbent_hypervolume:
+            if area > incumbent_area:
                 incumbent_config = config_result.config
-                incumbent_hypervolume = hypervolume
+                incumbent_area = area
         
         if incumbent_config is None:
             raise ValueError("No incumbent found.")
