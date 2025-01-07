@@ -24,6 +24,14 @@ SEED = 42
 np.random.seed(SEED)
 random.seed(SEED)
 
+result_mopb = evaluate_mopb(
+    OPENML_TASK_ID,
+    30,
+    eta=ETA,
+    incumbent_selection="hypervolume",
+)
+exit()
+
 
 for n_evaluations in N_EVALUATIONS:
     result_mopb = evaluate_mopb(

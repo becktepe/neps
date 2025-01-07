@@ -11,6 +11,7 @@ import torch
 
 from neps.utils.common import instance_from_map
 from ...search_spaces.search_space import SearchSpace
+from ...search_spaces.hyperparameters.constant import ConstantParameter
 from ..bayesian_optimization.acquisition_functions import AcquisitionMapping
 from ..bayesian_optimization.acquisition_functions.base_acquisition import (
     BaseAcquisition,
@@ -35,6 +36,11 @@ TOLERANCE = 1e-2  # 1%
 SAMPLE_THRESHOLD = 1000  # num samples to be rejected for increasing hypersphere radius
 DELTA_THRESHOLD = 1e-2  # 1%
 TOP_EI_SAMPLE_COUNT = 10
+
+from datetime import datetime
+
+# get now as string
+now = datetime.now()
 
 
 class SamplingPolicy(ABC):
@@ -175,10 +181,12 @@ class EnsemblePolicy(SamplingPolicy):
         )
 
         if policy == "prior":
+            origin = "prior"
             config = self.pipeline_space.sample(
                 patience=self.patience, user_priors=True, ignore_fidelity=True
             )
         elif policy == "inc":
+            origin = "incumbent"
 
             if (
                 hasattr(self.pipeline_space, "has_prior")
@@ -256,10 +264,18 @@ class EnsemblePolicy(SamplingPolicy):
                     f"{{'mutation', 'crossover', 'hypersphere', 'gaussian'}}"
                 )
         else:
+            origin = "random"
+
             # random
             config = self.pipeline_space.sample(
                 patience=self.patience, user_priors=False, ignore_fidelity=True
             )
+
+        # add time to filename
+        filename = f"./{now.strftime('%Y-%m-%d-%H-%M-%S')}_sampling_policy.log"
+        with open(filename, "a") as f:
+            f.write(f"{origin}\n")
+        
         return config
 
 

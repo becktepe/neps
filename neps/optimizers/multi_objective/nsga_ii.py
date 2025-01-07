@@ -79,10 +79,11 @@ class NSGAII(MultiObjectiveOptimizer):
             crowding_distance = self.crowding_distance_assignment(front_results)
 
             # Since we want to sort ascendingly by crowding distance, we need to negate it
-            # As second sorting criterion, we use the area spanned by the configuration and the reference point
+            # As second sorting criterion, we use the first objective since we consider it 
+            # to be most important
             _sorted_configs = sorted(
                 crowding_distance.keys(),
-                key=lambda c: (-crowding_distance[c], self._compute_area(rung_results[c])),
+                key=lambda c: (-crowding_distance[c], rung_results[c].result[self._objectives[0]]),
             )
             sorted_configs.extend(_sorted_configs)
 
