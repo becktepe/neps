@@ -17,6 +17,7 @@ import numpy as np
 import yaml
 
 from neps.search_spaces.architecture.graph_grammar import GraphParameter
+from neps.search_spaces.architecture.cfg_parameter import CFGParameter
 from neps.search_spaces.hyperparameters import (
     CategoricalParameter,
     ConstantParameter,
@@ -519,6 +520,9 @@ class SearchSpace(Mapping[str, Any]):
             if isinstance(hp, GraphParameter):
                 hps["graphs"].append(hp.value)
 
+            elif isinstance(hp, CFGParameter):
+                hps["cfgs"].append(hp.value)
+
             elif isinstance(hp, CategoricalParameter):
                 assert hp.value is not None
                 hp_value = hp.value_to_normalized(hp.value)
@@ -583,6 +587,8 @@ class SearchSpace(Mapping[str, Any]):
             elif isinstance(hp, GraphParameter):
                 # TODO(eddiebergman): This was what the old behaviour would do...
                 pass
+            elif isinstance(hp, CFGParameter):
+                pass
             elif isinstance(hp, CategoricalParameter):
                 features["categorical"] += 1
             elif isinstance(hp, NumericalParameter):
@@ -634,7 +640,7 @@ class SearchSpace(Mapping[str, Any]):
         for hp in self.hyperparameters.values():
             # NOTE(eddiebergman): This is a temporary fix to avoid graphs
             # If this is resolved, please update the docstring!
-            if isinstance(hp, GraphParameter):
+            if isinstance(hp, GraphParameter) or isinstance(hp, CFGParameter):
                 raise ValueError("Trying to create a grid for graphs!")
 
             if isinstance(hp, CategoricalParameter):
@@ -683,7 +689,7 @@ class SearchSpace(Mapping[str, Any]):
             serialized_config[name] = hp.serialize_value(hp.value)
         return serialized_config
 
-    def load_from(self, config: Mapping[str, Any | GraphParameter]) -> None:
+    def load_from(self, config: Mapping[str, Any | GraphParameter | CFGParameter]) -> None:
         """Load a configuration from a dictionary, setting all the values."""
         for name, val in config.items():
             self.hyperparameters[name].load_from(val)

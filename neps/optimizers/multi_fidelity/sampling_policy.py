@@ -266,7 +266,6 @@ class EnsemblePolicy(SamplingPolicy):
                 patience=self.patience, user_priors=False, ignore_fidelity=True
             )
 
-        
         filename = "sampling_policy.log"
         directory = os.environ.get("NEPS_LOG_DIR", ".")
         with open(os.path.join(directory, filename), "a") as f:

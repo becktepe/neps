@@ -100,3 +100,76 @@ def get_architecture() -> neps.ArchitectureParameter:
         primitives=primitives,
         prior=prior_distr
     )
+
+def get_cfg_architecture() -> neps.CFGArchitectureParameter:
+    primitives = [
+        "unet",
+        "conv_encoder",
+        "res_encoder",
+        "down",
+        "conv_decoder",
+        "res_decoder",
+        "up",
+        "block",
+        "instance_norm",
+        "batch_norm",
+        "leaky_relu",
+        "relu",
+        "elu",
+        "prelu",
+        "gelu",
+        "1b",
+        "2b",
+        "3b",
+        "4b",
+        "5b",
+        "6b",
+        "dropout",
+        "no_dropout",
+    ]
+    
+    # We want to keep at least half of the stages to ensure that the network is deep enough
+    n_stages = 4
+    possible_n_stages = range(n_stages // 2, n_stages + 1)
+    starting_rule = [f"unet {n}E {n}D" for n in possible_n_stages]
+
+    def get_productions_dict(part: str, _n_stages: range) -> dict[str, list[str]]:
+        result = {}
+        for n in _n_stages:
+            if part == "encoder":
+                result[f"{n}E"] = [f"conv_{part} NORM, NONLIN, DROPOUT, {', '.join([f'{_n}EB, down' for _n in range(1, n)])}, {n}EB"]
+                result[f"{n}E"] = [f"res_{part} NORM, NONLIN, DROPOUT, {', '.join([f'{_n}EB, down' for _n in range(1, n)])}, {n}EB"]
+
+            elif part == "decoder":
+                result[f"{n}D"] = [f"conv_{part} NORM, NONLIN, DROPOUT, {', '.join([f'up, {_n}DB' for _n in range(1, n)])}"]
+                result[f"{n}D"] = [f"res_{part} NORM, NONLIN, DROPOUT, {', '.join([f'up, {_n}DB' for _n in range(1, n)])}"]
+
+            else:
+                raise ValueError(f"Unknown part: {part}")
+            
+        for _n in range(1, max(_n_stages) + 1):
+            result[f"{_n}EB"] = ["1b", "2b", "3b", "4b", "5b", "6b"]
+
+        for _n in range(1, max(_n_stages) + 1):
+            result[f"{_n}DB"] = ["1b", "2b", "3b", "4b", "5b", "6b"]
+        return result
+
+    encoder_rules = get_productions_dict("encoder", possible_n_stages) 
+    decoder_rules = get_productions_dict("decoder", possible_n_stages)
+
+    structure = {
+        "S": starting_rule,
+        **encoder_rules,
+        **decoder_rules,
+        "NORM": ["instance_norm", "batch_norm"],
+        "NONLIN": ["leaky_relu", "relu", "prelu", "gelu"],
+        "DROPOUT": ["dropout", "no_dropout"],
+    }
+
+    return neps.CFGArchitectureParameter(
+        structure=structure,
+        primitives=primitives,
+    )
+
+def get_default_cfg_architecture() -> neps.CFGArchitectureParameter:
+    return ""

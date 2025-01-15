@@ -1,4 +1,5 @@
 from neps.search_spaces.architecture.api import ArchitectureParameter, FunctionParameter
+from neps.search_spaces.architecture.cfg_api import CFGArchitectureParameter, CFGFunctionParameter
 from neps.search_spaces.architecture.graph_grammar import (
     GraphGrammar,
     GraphGrammarCell,
@@ -21,10 +22,12 @@ from neps.search_spaces.search_space import SearchSpace
 
 __all__ = [
     "ArchitectureParameter",
+    "CFGArchitectureParameter",
     "CategoricalParameter",
     "ConstantParameter",
     "FloatParameter",
     "FunctionParameter",
+    "CFGFunctionParameter",
     "GraphGrammar",
     "GraphGrammarCell",
     "GraphGrammarRepetitive",
