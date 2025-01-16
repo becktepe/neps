@@ -28,7 +28,10 @@ class CFGParameter(ParameterWithPrior[str, str], MutatableParameter):
 
     @override
     def clone(self) -> Self:
-        return self.__class__(**self.input_kwargs)
+        val = self.value
+        cloned = self.__class__(**self.input_kwargs)
+        cloned._value = val
+        return cloned
 
     @override
     def set_value(self, value: str | None) -> None:
@@ -56,23 +59,39 @@ class CFGParameter(ParameterWithPrior[str, str], MutatableParameter):
     @override
     def load_from(self, value: str | Self) -> None:
         if isinstance(value, CFGParameter):
+            assert value.value is not None
             value = value.value
 
-        self._value = value
+        self.create_from_id(value)
 
     def create_new_instance_from_value(self, value: str) -> Self:
         new_instance = self.clone()
         new_instance._value = value
         return new_instance
+    
+    def create_from_id(self, identifier: str) -> None:
+        self.id = identifier
+        self._value = identifier 
+        self._function_id = identifier
 
     @override
     def sample(self, *, user_priors: bool = False) -> Self:
         copy_self = self.clone()
-        copy_self._value = copy_self.grammar.sampler(1, user_priors=user_priors)[0]
+        
+        # For prior-sampling be mutate the default configuration
+        if user_priors:
+            assert self.default is not None
+            dummy_parent = self.create_new_instance_from_value(self.default)
+            copy_self._value = self.mutate(dummy_parent).value
+        else:
+            copy_self._value = copy_self.grammar.sampler(1, user_priors=user_priors)[0]
+        
         return copy_self
     
     def sample_value(self, *, user_priors: bool = False) -> str:
-        return self.sample(user_priors=user_priors).value
+        _value = self.sample(user_priors=user_priors).value
+        assert isinstance(_value, str)
+        return _value
     
     @override
     def mutate(
@@ -84,6 +103,7 @@ class CFGParameter(ParameterWithPrior[str, str], MutatableParameter):
         if parent is None:
             parent = self
         parent_string_tree = parent.value
+        assert parent_string_tree is not None
 
         # We have 10 trials to mutate the parent,
         # if we can't mutate it in 10 trials, we raise an exception
@@ -116,6 +136,9 @@ class CFGParameter(ParameterWithPrior[str, str], MutatableParameter):
             parent2 = self
         parent1_string_tree = parent1.value
         parent2_string_tree = parent2.value
+        assert parent1_string_tree is not None
+        assert parent2_string_tree is not None
+
         children = simple_crossover(
             parent1_string_tree, parent2_string_tree, self.grammar
         )

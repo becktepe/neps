@@ -6,6 +6,7 @@ from neps.search_spaces.architecture.graph_grammar import (
     GraphGrammarRepetitive,
     GraphParameter,
 )
+from neps.search_spaces.architecture.cfg_parameter import CFGParameter
 from neps.search_spaces.hyperparameters import (
     CategoricalParameter,
     ConstantParameter,
@@ -28,6 +29,7 @@ __all__ = [
     "FloatParameter",
     "FunctionParameter",
     "CFGFunctionParameter",
+    "CFGParameter",
     "GraphGrammar",
     "GraphGrammarCell",
     "GraphGrammarRepetitive",

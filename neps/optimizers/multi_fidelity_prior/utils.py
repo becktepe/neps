@@ -11,6 +11,7 @@ from neps.search_spaces import (
     Parameter,
     GraphParameter,
     SearchSpace,
+    CFGParameter
 )
 
 
@@ -44,7 +45,7 @@ def local_mutation(
                 else:
                     new_config[hp_name] = hp.clone()
 
-            elif isinstance(hp, GraphParameter):
+            elif isinstance(hp, GraphParameter) or isinstance(hp, CFGParameter):
                 if mutate_graphs:
                     new_config[hp_name] = hp.mutate(mutation_strategy="bananas")
                 else:

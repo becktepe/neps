@@ -172,4 +172,4 @@ def get_cfg_architecture() -> neps.CFGArchitectureParameter:
     )
 
 def get_default_cfg_architecture() -> neps.CFGArchitectureParameter:
-    return ""
+    return "(S unet (3E res_encoder (NORM batch_norm) (NONLIN relu) (DROPOUT dropout) (1EB 4b) down (2EB 6b) down (3EB 1b)) (3D res_decoder (NORM batch_norm) (NONLIN relu) (DROPOUT dropout) up (1DB 6b) up (2DB 3b)))"
