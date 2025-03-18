@@ -53,6 +53,7 @@ class NSGAII(MultiObjectiveOptimizer):
 
         for o in self._objectives: 
             o_min, o_max = self._objective_bounds[o]
+
             sorted_configs = sorted(configs.keys(), key=lambda c: configs[c].result[o])
 
             distances[sorted_configs[0]] = np.inf
@@ -61,7 +62,6 @@ class NSGAII(MultiObjectiveOptimizer):
             for i in range(2, len(sorted_configs) - 1):
                 config_key = sorted_configs[i]
                 distances[config_key] += (configs[sorted_configs[i + 1]].result[o] - configs[sorted_configs[i + 1]].result[o]) / (o_max - o_min)
-
         return distances    
 
     def get_result(self, config_result: ConfigResult) -> float:

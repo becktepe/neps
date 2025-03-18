@@ -1,4 +1,4 @@
-from typing import Any, ClassVar, Mapping
+from typing import Any, ClassVar, Mapping, Literal
 from typing_extensions import override, Self
 
 from neps.search_spaces.architecture.cfg import Grammar
@@ -19,12 +19,14 @@ class CFGParameter(ParameterWithPrior[str, str], MutatableParameter):
             grammar: Grammar,
             default: str | None = None,
             prior: dict | None = None,
+            prior_sampling_mode: Literal["mutation", "distribution"] = "mutation",
         ):
         ParameterWithPrior.__init__(self, value=None, default=default, is_fidelity=False)
         self.grammar = grammar
         if prior is not None:
             self.grammar.prior = prior
         self.has_prior = prior is not None
+        self.prior_sampling_mode = prior_sampling_mode
 
     @override
     def clone(self) -> Self:
@@ -79,7 +81,7 @@ class CFGParameter(ParameterWithPrior[str, str], MutatableParameter):
         copy_self = self.clone()
         
         # For prior-sampling be mutate the default configuration
-        if user_priors:
+        if self.prior_sampling_mode == "mutation":
             assert self.default is not None
             dummy_parent = self.create_new_instance_from_value(self.default)
             copy_self._value = self.mutate(dummy_parent).value

@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import inspect
-from typing import Callable
+from typing import Literal
 
 
 from .cfg_parameter import CFGParameter
@@ -54,6 +54,7 @@ def CFGArchitectureParameter(**kwargs):
             primitives: str,
             constraint_kwargs: dict | None = None,
             name: str = "CFGArchitectureParameter",
+            prior_sampling_mode: Literal["mutation", "distribution"] = "mutation",
             **kwargs,
         ):
             local_vars = locals()
@@ -79,6 +80,7 @@ def CFGArchitectureParameter(**kwargs):
 
                 super().__init__(
                     grammar=structure,  # type: ignore[arg-type]
+                    prior_sampling_mode=prior_sampling_mode,
                     **kwargs,
                 )
 

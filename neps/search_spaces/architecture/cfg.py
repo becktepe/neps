@@ -344,6 +344,10 @@ class Grammar(CFG):
                 if _s.startswith(sym):
                     break
             else:
+                print(f"Error in prior computation for {string_tree}")
+                print(f"Symbols: {symbols}")
+                print(f"Index {i}")
+                print(f"{string_tree[i - 10:i]}>>>{string_tree[i]}<<<{string_tree[i + 1:i + 10]}")
                 raise RuntimeError(f"Terminal or nonterminal at position {i} does not exist")
 
             i += len(sym) - 1
